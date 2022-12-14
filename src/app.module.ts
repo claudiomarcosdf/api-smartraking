@@ -5,11 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost:27017/smartraking', {
-      useNewUrlParser: true,
+      useNewUrlParser: true
     }),
-    JogadoresModule,
+    JogadoresModule
   ],
   controllers: [],
-  providers: [],
+  providers: []
 })
 export class AppModule {}
