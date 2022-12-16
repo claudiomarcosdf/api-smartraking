@@ -6,9 +6,10 @@ import { JogadorSchema } from './interfaces/jogador.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Jogador', schema: JogadorSchema }]),
+    MongooseModule.forFeature([{ name: 'Jogador', schema: JogadorSchema }])
   ],
   controllers: [JogadoresController],
   providers: [JogadoresService],
+  exports: [JogadoresService]
 })
 export class JogadoresModule {}
