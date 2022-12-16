@@ -49,6 +49,32 @@ export class CategoriasService {
     return categoriaEncontrada;
   }
 
+  async consultarCategoriaDoJogador(idJogador: any): Promise<Categoria> {
+    /*
+    Desafio
+    Escopo da exceção realocado para o próprio Categorias Service
+    Verificar se o jogador informado já se encontra cadastrado
+    */
+
+    //await this.jogadoresService.consultarJogadorPeloId(idJogador)
+
+    const jogadores = await this.jogadoresService.consultarTodosJogadores();
+
+    const jogadorFilter = jogadores.filter(
+      (jogador) => jogador._id == idJogador
+    );
+
+    if (jogadorFilter.length == 0) {
+      throw new BadRequestException(`O id ${idJogador} não é um jogador!`);
+    }
+
+    return await this.categoriaModel
+      .findOne()
+      .where('jogadores')
+      .in(idJogador)
+      .exec();
+  }
+
   async atualizarCatetoria(
     categoria: string,
     atualizarCategoriaDto: AtualizarCategoriaDto
@@ -78,21 +104,31 @@ export class CategoriasService {
       .findOne({ categoria })
       .exec();
 
-    await this.jogadoresService.consultarJogadorPeloId(idJogador); //se não exitir lança exceção
+    //await this.jogadoresService.consultarJogadorPeloId(idJogador); //se não exitir lança exceção
 
-    const jogadorJaCadastradoNaCategoria = await this.categoriaModel
-      .find({ categoria })
-      .where('jogadores')
-      .in(idJogador)
-      .exec();
+    const jogadores = await this.jogadoresService.consultarTodosJogadores();
+
+    const jogadorFilter = jogadores.filter(
+      (jogador) => jogador._id == idJogador
+    );
+
+    if (jogadorFilter.length == 0) {
+      throw new BadRequestException(`O id ${idJogador} não é um jogador!`);
+    }
 
     if (!categoriaEncontrada) {
       throw new BadRequestException(`Categoria ${categoria} não cadastrada!`);
     }
 
-    if (jogadorJaCadastradoNaCategoria.length > 0) {
+    const jogadorJaCadastradoNaCategoria = await this.categoriaModel
+      .findOne({ categoria })
+      .where('jogadores')
+      .in(idJogador)
+      .exec();
+
+    if (jogadorJaCadastradoNaCategoria) {
       throw new BadRequestException(
-        `Jogador ${idJogador} já cadastrado na categoria!`
+        `Jogador ${idJogador} já cadastrado na categoria ${jogadorJaCadastradoNaCategoria.categoria}!`
       );
     }
 
